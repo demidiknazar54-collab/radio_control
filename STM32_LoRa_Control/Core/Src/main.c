@@ -119,6 +119,8 @@ int main(void)
           "SX1278 Version: 0x%02X\r\n",
           SX1278_ReadVersion()
       );
+
+      CommandParser_Process("mode rx");   // За замовчуванням плата працює як приймач.
   }
   else
   {
@@ -148,12 +150,32 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	    if (DebugUART_ReadLine(uart_line, sizeof(uart_line)))
-	    {
-	        CommandParser_Process(uart_line);
-	    }
+      // Команди з UART.
+      if (DebugUART_ReadLine(uart_line, sizeof(uart_line)))
+      {
+          CommandParser_Process(uart_line);
+      }
 
-	    SX1278_Process();
+      // Обробка подій радіомодуля.
+      SX1278_Process();
+
+      // Отримання пакета з буфера драйвера.
+      SX1278_Packet packet;
+
+      if (SX1278_ReadPacket(&packet) == SX1278_OK)
+      {
+          DebugUART_Printf(
+              "RX: %.*s\r\n",
+              (int)packet.length,
+              (const char *)packet.data
+          );
+
+          DebugUART_Printf(
+              "Length: %u bytes, RSSI: %d dBm\r\n",
+              (unsigned int)packet.length,
+              (int)packet.rssi_dbm
+          );
+      }
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
