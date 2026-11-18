@@ -1,0 +1,7 @@
+../Core/Src/UART.c:24:6:DebugUART_Init	2
+../Core/Src/UART.c:44:6:DebugUART_Print	3
+../Core/Src/UART.c:57:6:DebugUART_Printf	4
+../Core/Src/UART.c:82:10:DebugUART_Available	2
+../Core/Src/UART.c:93:5:DebugUART_Read	2
+../Core/Src/UART.c:105:9:DebugUART_ReadLine	12
+../Core/Src/UART.c:165:6:DebugUART_RxCallback	3

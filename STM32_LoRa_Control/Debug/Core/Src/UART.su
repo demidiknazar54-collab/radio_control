@@ -1,0 +1,7 @@
+../Core/Src/UART.c:24:6:DebugUART_Init	24	static
+../Core/Src/UART.c:44:6:DebugUART_Print	24	static
+../Core/Src/UART.c:57:6:DebugUART_Printf	144	static
+../Core/Src/UART.c:82:10:DebugUART_Available	16	static
+../Core/Src/UART.c:93:5:DebugUART_Read	16	static
+../Core/Src/UART.c:105:9:DebugUART_ReadLine	24	static
+../Core/Src/UART.c:165:6:DebugUART_RxCallback	24	static
