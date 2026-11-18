@@ -57,6 +57,13 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
+#define LORA_RST_Pin GPIO_PIN_2
+#define LORA_RST_GPIO_Port GPIOA
+#define LORA_DIO0_Pin GPIO_PIN_3
+#define LORA_DIO0_GPIO_Port GPIOA
+#define LORA_DIO0_EXTI_IRQn EXTI3_IRQn
+#define LORA_NSS_Pin GPIO_PIN_4
+#define LORA_NSS_GPIO_Port GPIOA
 
 /* USER CODE BEGIN Private defines */
 

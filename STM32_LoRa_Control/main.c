@@ -22,7 +22,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "UART.h"
-
+#include "CommandParser.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -96,7 +96,9 @@ int main(void)
   DebugUART_Init(&huart1);
 
   DebugUART_Print("\r\nSystem started!\r\n");
-  DebugUART_Print("UART TX/RX initialized\r\n");
+  DebugUART_Print("UART TX/RX initialized!\r\n");
+
+  CommandParser_Init();
 
   /* USER CODE END 2 */
 
@@ -106,7 +108,7 @@ int main(void)
   {
 	    if (DebugUART_ReadLine(uart_line, sizeof(uart_line)))
 	    {
-	        DebugUART_Printf("Received: %s\r\n", uart_line);
+	        CommandParser_Process(uart_line);
 	    }
     /* USER CODE END WHILE */
 
@@ -208,11 +210,7 @@ static void MX_GPIO_Init(void)
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 	{
-	    if (huart->Instance == USART1)
-	    {
-	        uart_rx_count++;
-	        DebugUART_RxCallback(huart);
-	    }
+	DebugUART_RxCallback(huart);
 }
 
 

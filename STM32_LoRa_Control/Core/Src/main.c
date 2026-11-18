@@ -22,7 +22,8 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "UART.h"
-
+#include "CommandParser.h"
+#include "SX1278.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -41,6 +42,8 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
+SPI_HandleTypeDef hspi1;
+
 UART_HandleTypeDef huart1;
 
 /* USER CODE BEGIN PV */
@@ -53,6 +56,7 @@ uint32_t last_count = 0;
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_USART1_UART_Init(void);
+static void MX_SPI1_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -92,12 +96,52 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_USART1_UART_Init();
+  MX_SPI1_Init();
   /* USER CODE BEGIN 2 */
   DebugUART_Init(&huart1);
 
   DebugUART_Print("\r\nSystem started!\r\n");
   DebugUART_Print("UART TX/RX initialized\r\n");
 
+  CommandParser_Init();
+
+  DebugUART_Print("\r\nSX1278 initialization...\r\n");
+
+  SX1278_Config lora_config = SX1278_DefaultConfig();
+
+  SX1278_Status result = SX1278_Init(&hspi1, &lora_config);
+
+  if (result == SX1278_OK)
+  {
+      DebugUART_Print("SX1278 initialized OK\r\n");
+
+      DebugUART_Printf(
+          "SX1278 Version: 0x%02X\r\n",
+          SX1278_ReadVersion()
+      );
+  }
+  else
+  {
+      DebugUART_Printf(
+          "SX1278 initialization ERROR: %d\r\n",
+          result
+      );
+
+      DebugUART_Printf(
+          "RegVersion: 0x%02X\r\n",
+          SX1278_ReadVersion()
+      );
+
+      DebugUART_Printf(
+          "SPI State: %d\r\n",
+          HAL_SPI_GetState(&hspi1)
+      );
+
+      DebugUART_Printf(
+          "SPI Error: 0x%lX\r\n",
+          (unsigned long)HAL_SPI_GetError(&hspi1)
+      );
+  }
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -106,8 +150,10 @@ int main(void)
   {
 	    if (DebugUART_ReadLine(uart_line, sizeof(uart_line)))
 	    {
-	        DebugUART_Printf("Received: %s\r\n", uart_line);
+	        CommandParser_Process(uart_line);
 	    }
+
+	    SX1278_Process();
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -152,6 +198,44 @@ void SystemClock_Config(void)
 }
 
 /**
+  * @brief SPI1 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_SPI1_Init(void)
+{
+
+  /* USER CODE BEGIN SPI1_Init 0 */
+
+  /* USER CODE END SPI1_Init 0 */
+
+  /* USER CODE BEGIN SPI1_Init 1 */
+
+  /* USER CODE END SPI1_Init 1 */
+  /* SPI1 parameter configuration*/
+  hspi1.Instance = SPI1;
+  hspi1.Init.Mode = SPI_MODE_MASTER;
+  hspi1.Init.Direction = SPI_DIRECTION_2LINES;
+  hspi1.Init.DataSize = SPI_DATASIZE_8BIT;
+  hspi1.Init.CLKPolarity = SPI_POLARITY_LOW;
+  hspi1.Init.CLKPhase = SPI_PHASE_1EDGE;
+  hspi1.Init.NSS = SPI_NSS_SOFT;
+  hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_2;
+  hspi1.Init.FirstBit = SPI_FIRSTBIT_MSB;
+  hspi1.Init.TIMode = SPI_TIMODE_DISABLE;
+  hspi1.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
+  hspi1.Init.CRCPolynomial = 10;
+  if (HAL_SPI_Init(&hspi1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN SPI1_Init 2 */
+
+  /* USER CODE END SPI1_Init 2 */
+
+}
+
+/**
   * @brief USART1 Initialization Function
   * @param None
   * @retval None
@@ -191,12 +275,33 @@ static void MX_USART1_UART_Init(void)
   */
 static void MX_GPIO_Init(void)
 {
+  GPIO_InitTypeDef GPIO_InitStruct = {0};
   /* USER CODE BEGIN MX_GPIO_Init_1 */
 
   /* USER CODE END MX_GPIO_Init_1 */
 
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOA_CLK_ENABLE();
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOA, LORA_RST_Pin|LORA_NSS_Pin, GPIO_PIN_SET);
+
+  /*Configure GPIO pins : LORA_RST_Pin LORA_NSS_Pin */
+  GPIO_InitStruct.Pin = LORA_RST_Pin|LORA_NSS_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : LORA_DIO0_Pin */
+  GPIO_InitStruct.Pin = LORA_DIO0_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(LORA_DIO0_GPIO_Port, &GPIO_InitStruct);
+
+  /* EXTI interrupt init*/
+  HAL_NVIC_SetPriority(EXTI3_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(EXTI3_IRQn);
 
   /* USER CODE BEGIN MX_GPIO_Init_2 */
 
@@ -208,14 +313,16 @@ static void MX_GPIO_Init(void)
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 	{
-	    if (huart->Instance == USART1)
-	    {
-	        uart_rx_count++;
-	        DebugUART_RxCallback(huart);
-	    }
+    DebugUART_RxCallback(huart);
 }
 
-
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+    if (GPIO_Pin == LORA_DIO0_Pin)
+    {
+        SX1278_Dio0IrqHandler();
+    }
+}
 /* USER CODE END 4 */
 
 /**
