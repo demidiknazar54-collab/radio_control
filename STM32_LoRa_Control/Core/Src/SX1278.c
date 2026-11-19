@@ -81,7 +81,7 @@ static bool set_hw_mode(uint8_t bits)
 
 SX1278_Config SX1278_DefaultConfig(void)
 {
-    SX1278_Config c = {433000000UL, 7, 7, 5, 0x12, 8, 14, true};
+    SX1278_Config c = {433000000UL, 7, 7, 5, 0x12, 8, 14, true}; //Конфігурація лори
     return c;
 }
 

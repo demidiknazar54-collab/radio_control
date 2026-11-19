@@ -1,0 +1,10 @@
+../Core/Src/ControlProtocol.c:4:17:crc16	4
+../Core/Src/ControlProtocol.c:16:13:put32	2
+../Core/Src/ControlProtocol.c:21:17:get32	1
+../Core/Src/ControlProtocol.c:27:13:valid	7
+../Core/Src/ControlProtocol.c:34:6:Control_Encode	4
+../Core/Src/ControlProtocol.c:46:6:Control_Decode	9
+../Core/Src/ControlProtocol.c:58:13:Control_CommandName	6
+../Core/Src/ControlProtocol.c:70:6:ControlTracker_Reset	1
+../Core/Src/ControlProtocol.c:76:20:ControlTracker_Add	7
+../Core/Src/ControlProtocol.c:93:6:ControlTracker_Report	5

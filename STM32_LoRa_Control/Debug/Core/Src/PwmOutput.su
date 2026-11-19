@@ -1,0 +1,5 @@
+../Core/Src/PwmOutput.c:21:13:set_duty	0	static
+../Core/Src/PwmOutput.c:6:19:PwmOutput_Init	8	static
+../Core/Src/PwmOutput.c:30:6:PwmOutput_ApplyCommand	8	static
+../Core/Src/PwmOutput.c:43:6:PwmOutput_Stop	8	static
+../Core/Src/PwmOutput.c:44:9:PwmOutput_GetDuty	0	static

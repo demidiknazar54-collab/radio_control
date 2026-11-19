@@ -1,3 +1,4 @@
-../Core/Src/CommandParser.c:18:6:CommandParser_Init	8	static
-../Core/Src/CommandParser.c:29:14:CommandParser_GetMode	4	static
-../Core/Src/CommandParser.c:34:6:CommandParser_Process	40	static
+../Core/Src/CommandParser.c:5:13:number	4	static
+../Core/Src/CommandParser.c:20:6:CommandParser_Init	8	static
+../Core/Src/CommandParser.c:25:14:CommandParser_GetMode	8	static
+../Core/Src/CommandParser.c:27:6:CommandParser_Process	152	static

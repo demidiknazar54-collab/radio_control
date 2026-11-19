@@ -1,0 +1,10 @@
+../Core/Src/ControlProtocol.c:4:17:crc16	0	static
+../Core/Src/ControlProtocol.c:16:13:put32	0	static
+../Core/Src/ControlProtocol.c:21:17:get32	0	static
+../Core/Src/ControlProtocol.c:27:13:valid	0	static
+../Core/Src/ControlProtocol.c:34:6:Control_Encode	16	static
+../Core/Src/ControlProtocol.c:46:6:Control_Decode	32	static
+../Core/Src/ControlProtocol.c:58:13:Control_CommandName	0	static
+../Core/Src/ControlProtocol.c:70:6:ControlTracker_Reset	16	static
+../Core/Src/ControlProtocol.c:76:20:ControlTracker_Add	16	static
+../Core/Src/ControlProtocol.c:93:6:ControlTracker_Report	4	static
